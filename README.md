@@ -1,11 +1,11 @@
 # Fall-Data-Challenge-2020
 
-Aims:
+### Aims:  
 provide insights to inspire more people to vote
 in the upcoming November 3rd election
 
 
-Information Provided:
+### Information Provided:  
 age, gender, race, ethnicity, marital status, military veteran status,
 size of community, employment status, and educational background. 
 whether they were registered to vote (and if they were not registered, the reason why not),
