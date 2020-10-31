@@ -77,6 +77,45 @@ colnames(data_2016_target) <-
 colnames(data_2016_target)
 head(data_2016_target)
 
+# count the total pop by race
+race_class <- data_2016_target %>%
+  group_by(race) %>%
+  summarize(
+    total_num = n()
+  )
+
+# count the pop reg for vote by race
+# (for those who did not vote in the most recent election)
+reg_race_class <- data_2016_target %>%
+  group_by(race) %>%
+  filter(voreg == "Registered") %>%
+  summarize(
+    reg_num = n()
+  )
+
+# count the pop voted by race
+#  (for those who were registered)
+voted_race_class <- data_2016_target %>%
+  group_by(race) %>%
+  filter(voted == "Voted") %>%
+  summarize(
+    voted_num = n()
+  )
+
+# calculate the percentage of voted pop in total pop by race
+voted_percent_total <- race_class %>%
+  left_join(voted_race_class, by="race") %>%
+  mutate(
+    voted_percent = voted_num / total_num
+  )
+
+# calculate the percentage of registerted pop grouped by race
+reg_percent_total <- race_class %>%
+  left_join(reg_race_class, by="race") %>%
+  mutate(
+    reg_percent = reg_num / total_num
+  )
+
 ### Research Questions:
 # 1. Compare the voting participation percentage across different races with the entire race
 #    percentage across the nation. (variable: race, ages, year; mutate percent_"race")
@@ -84,7 +123,7 @@ head(data_2016_target)
 # then group by race
 # join the dataset with population in each race in terms of total population
 data_2016_race <- data_2016_target %>%
-  select(YEAR, AGE, SEX, RACE)
+  select(year, age, sex, race)
 
 # 2. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
