@@ -122,7 +122,15 @@ reg_percent_total <- race_class %>%
 # then group by race
 # join the dataset with population in each race in terms of total population
 data_2016_race <- data_2016_target %>%
-  select(year, age, sex, race)
+  select(year, age, sex, race, voted)
+
+data_2016_race <- data_2016_race %>%
+  left_join(voted_percent_total, by="race") %>%
+  arrange(desc(total_num))
+
+ggplot(data = data_2016_race) +
+  geom_col(mapping = aes(x = race, y = total_num, fill = voted), position = "fill") +
+  coord_flip()
 
 # 2. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
