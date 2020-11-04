@@ -1,5 +1,8 @@
 library("dplyr")
 library(tidyverse)
+library("plotly")
+library(ggrepel)
+library(forcats)
 data_2016 <- read.csv("Data/data_2016.csv", stringsAsFactors = FALSE)
 data_dictonary <- read.csv("Data/data_dictionary.csv", stringsAsFactors = FALSE)
 
@@ -128,9 +131,17 @@ data_2016_race <- data_2016_race %>%
   left_join(voted_percent_total, by="race") %>%
   arrange(desc(total_num))
 
-ggplot(data = data_2016_race) +
-  geom_col(mapping = aes(x = race, y = total_num, fill = voted), position = "fill") +
-  coord_flip()
+turnout_barplot <- 
+  ggplot(data_2016_race) +
+  geom_col(mapping = aes(x = fct_rev(fct_infreq(race)), y = total_num, fill = voted), position = "fill") +
+  coord_flip() +
+  labs(
+    title = "Percent of Surveyed Population who Voted in each Race in 2016",
+    subtitle = "in the descending order of total surveyed population by race",
+    y = "Total Surveyed Population", 
+    x = "Percentage of Population that voted"
+  )
+ggplotly(turnout_barplot)
 
 # 2. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
