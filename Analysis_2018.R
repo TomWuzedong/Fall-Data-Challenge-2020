@@ -77,11 +77,10 @@ data_2018_target <- data_2018_target %>%
 
 colnames(data_2018_target) <- 
   c("year", "age", "state", "race", "sex", "voreg", "voreghow", "voynotreg", "voted", "votehow", "vowhynot")
-colnames(data_2018_target)
-head(data_2018_target)
+
 
 # count the total pop by race
-race_class <- data_2018_target %>%
+race_class_2018 <- data_2018_target %>%
   group_by(race) %>%
   summarize(
     total_num = n()
@@ -89,7 +88,7 @@ race_class <- data_2018_target %>%
 
 # count the pop reg for vote by race
 # (for those who did not vote in the most recent election)
-reg_race_class <- data_2018_target %>%
+reg_race_class_2018 <- data_2018_target %>%
   group_by(race) %>%
   filter(voreg == "Registered") %>%
   summarize(
@@ -98,7 +97,7 @@ reg_race_class <- data_2018_target %>%
 
 # count the pop voted by race
 #  (for those who were registered)
-voted_race_class <- data_2018_target %>%
+voted_race_class_2018 <- data_2018_target %>%
   group_by(race) %>%
   filter(voted == "Voted") %>%
   summarize(
@@ -106,15 +105,55 @@ voted_race_class <- data_2018_target %>%
   )
 
 # calculate the percentage of voted pop in total pop by race
-voted_percent_total <- race_class %>%
-  left_join(voted_race_class, by="race") %>%
+voted_percent_total_2018 <- race_class_2018 %>%
+  left_join(voted_race_class_2018, by="race") %>%
   mutate(
     voted_percent = voted_num / total_num
   )
 
 # calculate the percentage of registerted pop grouped by race
-reg_percent_total <- race_class %>%
-  left_join(reg_race_class, by="race") %>%
+reg_percent_total_2018 <- race_class_2018 %>%
+  left_join(reg_race_class_2018, by="race") %>%
+  mutate(
+    reg_percent = reg_num / total_num
+  )
+
+# count the total pop by state
+state_class_2018 <- 
+  data_2018_target %>%
+  group_by(state) %>%
+  summarize(
+    total_num = n()
+  )
+
+# count the pop reg for vote by state
+# (for those who did not vote in the most recent election)
+reg_state_class_2018 <- data_2018_target %>%
+  group_by(state) %>%
+  filter(voreg == "Registered") %>%
+  summarize(
+    reg_num = n()
+  )
+
+# count the pop voted by state
+#  (for those who were registered)
+voted_state_class_2018 <- data_2018_target %>%
+  group_by(state) %>%
+  filter(voted == "Voted") %>%
+  summarize(
+    voted_num = n()
+  )
+
+# calculate the percentage of voted pop in total pop by state
+voted_percent_total_state_2018 <- state_class_2018 %>%
+  left_join(voted_state_class_2018, by="state") %>%
+  mutate(
+    voted_percent = voted_num / total_num
+  )
+
+# calculate the percentage of registerted pop grouped by state
+reg_percent_total_state_2018 <- state_class_2018 %>%
+  left_join(reg_state_class_2018, by="state") %>%
   mutate(
     reg_percent = reg_num / total_num
   )
@@ -129,10 +168,12 @@ data_2018_race <- data_2018_target %>%
   select(year, age, sex, race, voted)
 
 data_2018_race <- data_2018_race %>%
-  left_join(voted_percent_total, by="race") %>%
+  left_join(voted_percent_total_2018, by="race") %>%
   arrange(desc(total_num))
 
-turnout_barplot <- 
+data_2018_race[is.na(data_2018_race)] <- 0
+
+turnout_barplot_2018 <- 
   ggplot(data_2018_race) +
   geom_col(mapping = aes(x = fct_rev(fct_infreq(race)), 
                          y = total_num, fill = voted), 
@@ -148,15 +189,70 @@ turnout_barplot <-
   #   y = "Total Surveyed Population", 
   #   x = "Percentage of Population that voted"
   # )
-turnout_barplot_interactive <- 
-  ggplotly(turnout_barplot) %>%
+turnout_barplot_interactive_2018 <- 
+  ggplotly(turnout_barplot_2018) %>%
   layout(
     title = "Percent of Surveyed Population who Voted in each Race in 2018",                  
     xaxis = list(title = "Percentage of Population that voted"), 
     yaxis = list(title = "Total Surveyed Population")
   )
 
-# 2. Analyzing the relatively more common reasons for people
+turnout_sex_2018 <- turnout_barplot_2018 + facet_wrap(~sex) + theme(axis.title.x=element_blank(),
+                                                          axis.title.y = element_blank())
+turnout_sex_interactive_2018 <- 
+  ggplotly(turnout_sex_2018) %>%
+  layout(
+    title = "Percent of Surveyed Population who Voted by gender in 2018",                  
+    xaxis = list(title = "Percentage of Population that voted"), 
+    yaxis = list(title = "Total Surveyed Population")
+  )
+
+
+# 2. Compare the voting participation percentage across different state across the nation.
+
+data_2018_state <- voted_percent_total_state_2018 %>%
+  select(state, voted_percent) %>%
+  mutate(state = tolower(state))
+
+
+# Load a shapefile of U.S. states using ggplot's `map_data()` function
+state_shape_2018 <- map_data("state") %>%
+  rename(state = region) %>%
+  left_join(data_2018_state, by="state")
+
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(),        # remove axis lines
+    axis.text = element_blank(),        # remove axis labels
+    axis.ticks = element_blank(),       # remove axis ticks
+    axis.title = element_blank(),       # remove axis titles
+    plot.background = element_blank(),  # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank()      # remove border around plot
+  )
+
+turnout_state_2018 <- 
+  ggplot(state_shape_2018) +
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = voted_percent),
+    color = "white", 
+    size = .1       
+  ) +
+  coord_map() + # use a map-based coordinate system
+  scale_fill_continuous(low = "white", high = "Red") +
+  labs(title = "Percent of Surveyed Population who Voted by state in 2018",
+       fill = "voted_percent") +
+  blank_theme
+
+top_10_state_2018 <- voted_percent_total_state_2018 %>%
+  top_n(10, voted_percent) %>%
+  arrange(desc(voted_percent))
+
+
+# 3. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
 
-# 3. Analyzing the voting methods preferences across (ages, races)
+
+
+# 4. Analyzing the voting methods preferences across (ages, races)

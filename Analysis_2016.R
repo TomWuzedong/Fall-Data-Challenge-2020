@@ -3,6 +3,8 @@ library(tidyverse)
 library("plotly")
 library(ggrepel)
 library(forcats)
+library(maps)
+library(mapproj)
 data_2016 <- read.csv("Data/data_2016.csv", stringsAsFactors = FALSE)
 data_dictonary <- read.csv("Data/data_dictionary.csv", stringsAsFactors = FALSE)
 
@@ -76,11 +78,10 @@ data_2016_target <- data_2016_target %>%
 
 colnames(data_2016_target) <- 
   c("year", "age", "state", "race", "sex", "voreg", "voreghow", "voynotreg", "voted", "votehow", "vowhynot")
-colnames(data_2016_target)
-head(data_2016_target)
+
 
 # count the total pop by race
-race_class <- data_2016_target %>%
+race_class_2016 <- data_2016_target %>%
   group_by(race) %>%
   summarize(
     total_num = n()
@@ -88,7 +89,7 @@ race_class <- data_2016_target %>%
 
 # count the pop reg for vote by race
 # (for those who did not vote in the most recent election)
-reg_race_class <- data_2016_target %>%
+reg_race_class_2016 <- data_2016_target %>%
   group_by(race) %>%
   filter(voreg == "Registered") %>%
   summarize(
@@ -97,7 +98,7 @@ reg_race_class <- data_2016_target %>%
 
 # count the pop voted by race
 #  (for those who were registered)
-voted_race_class <- data_2016_target %>%
+voted_race_class_2016 <- data_2016_target %>%
   group_by(race) %>%
   filter(voted == "Voted") %>%
   summarize(
@@ -105,18 +106,60 @@ voted_race_class <- data_2016_target %>%
   )
 
 # calculate the percentage of voted pop in total pop by race
-voted_percent_total <- race_class %>%
-  left_join(voted_race_class, by="race") %>%
+voted_percent_total_2016 <- race_class_2016 %>%
+  left_join(voted_race_class_2016, by="race") %>%
   mutate(
     voted_percent = voted_num / total_num
   )
 
 # calculate the percentage of registerted pop grouped by race
-reg_percent_total <- race_class %>%
-  left_join(reg_race_class, by="race") %>%
+reg_percent_total_2016 <- race_class_2016 %>%
+  left_join(reg_race_class_2016, by="race") %>%
   mutate(
     reg_percent = reg_num / total_num
   )
+
+
+# count the total pop by state
+state_class_2016 <- 
+  data_2016_target %>%
+  group_by(state) %>%
+  summarize(
+    total_num = n()
+  )
+
+# count the pop reg for vote by state
+# (for those who did not vote in the most recent election)
+reg_state_class_2016 <- data_2016_target %>%
+  group_by(state) %>%
+  filter(voreg == "Registered") %>%
+  summarize(
+    reg_num = n()
+  )
+
+# count the pop voted by state
+#  (for those who were registered)
+voted_state_class_2016 <- data_2016_target %>%
+  group_by(state) %>%
+  filter(voted == "Voted") %>%
+  summarize(
+    voted_num = n()
+  )
+
+# calculate the percentage of voted pop in total pop by state
+voted_percent_total_state_2016 <- state_class_2016 %>%
+  left_join(voted_state_class_2016, by="state") %>%
+  mutate(
+    voted_percent = voted_num / total_num
+  )
+
+# calculate the percentage of registerted pop grouped by state
+reg_percent_total_state_2016 <- state_class_2016 %>%
+  left_join(reg_state_class_2016, by="state") %>%
+  mutate(
+    reg_percent = reg_num / total_num
+  )
+
 
 ### Research Questions:
 # 1. Compare the voting participation percentage across different races with the entire race
@@ -128,28 +171,88 @@ data_2016_race <- data_2016_target %>%
   select(year, age, sex, race, voted)
 
 data_2016_race <- data_2016_race %>%
-  left_join(voted_percent_total, by="race") %>%
+  left_join(voted_percent_total_2016, by="race") %>%
   arrange(desc(total_num))
 
-turnout_barplot <- 
+data_2016_race[is.na(data_2016_race)] <- 0
+
+turnout_barplot_2016 <- 
   ggplot(data_2016_race) +
-  geom_col(mapping = aes(x = fct_rev(fct_infreq(race)), y = total_num, fill = voted), position = "fill") +
-  # coord_flip() +
+  geom_col(mapping = aes(x = fct_rev(fct_infreq(race)), y = total_num, fill = voted),
+           position = "fill") +
+  # geom_label_repel(data = data_2016_race %>% group_by(race), 
+  # mapping = aes(x = fct_rev(fct_infreq(race)), y = total_num, label = voted_percent)) +
+  coord_flip()
   # labs(
   #   title = "Percent of Surveyed Population who Voted in each Race in 2016",
   #   subtitle = "in the descending order of total surveyed population by race",
   #   y = "Total Surveyed Population", 
   #   x = "Percentage of Population that voted"
   # )
-turnout_barplot_interactive <- 
-  ggplotly(turnout_barplot) %>%
+turnout_barplot_interactive_2016 <- 
+  ggplotly(turnout_barplot_2016) %>%
   layout(
     title = "Percent of Surveyed Population who Voted in each Race in 2016",                  
     xaxis = list(title = "Percentage of Population that voted"), 
     yaxis = list(title = "Total Surveyed Population")
   )
 
-# 2. Analyzing the relatively more common reasons for people
+
+turnout_sex_2016 <- turnout_barplot_2016 + facet_wrap(~sex) + theme(axis.title.x=element_blank(),
+                                                          axis.title.y = element_blank())
+turnout_sex_interactive_2016 <- 
+  ggplotly(turnout_sex_2016) %>%
+  layout(
+    title = "Percent of Surveyed Population who Voted by gender in 2016",                  
+    xaxis = list(title = "Percentage of Population that voted"), 
+    yaxis = list(title = "Total Surveyed Population")
+  )
+
+# 2. Compare the voting participation percentage across different state across the nation.
+
+data_2016_state <- voted_percent_total_state_2016 %>%
+  select(state, voted_percent) %>%
+  mutate(state = tolower(state))
+
+
+# Load a shapefile of U.S. states using ggplot's `map_data()` function
+state_shape_2016 <- map_data("state") %>%
+  rename(state = region) %>%
+  left_join(data_2016_state, by="state")
+
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(),        # remove axis lines
+    axis.text = element_blank(),        # remove axis labels
+    axis.ticks = element_blank(),       # remove axis ticks
+    axis.title = element_blank(),       # remove axis titles
+    plot.background = element_blank(),  # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank()      # remove border around plot
+  )
+
+turnout_state_2016 <- 
+  ggplot(state_shape_2016) +
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = voted_percent),
+    color = "white", 
+    size = .1       
+  ) +
+  coord_map() + # use a map-based coordinate system
+  scale_fill_continuous(low = "white", high = "Red") +
+  labs(title = "Percent of Surveyed Population who Voted by state in 2016",
+       fill = "voted_percent") +
+  blank_theme
+
+top_10_state_2016 <- voted_percent_total_state_2016 %>%
+  top_n(10, voted_percent) %>%
+  arrange(desc(voted_percent))
+  
+
+# 3. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
 
-# 3. Analyzing the voting methods preferences across (ages, races)
+
+
+# 4. Analyzing the voting methods preferences across (ages, races)
