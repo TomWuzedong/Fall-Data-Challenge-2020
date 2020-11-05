@@ -3,7 +3,10 @@ library(tidyverse)
 library("plotly")
 library(ggrepel)
 library(forcats)
-# library(scales)
+library(plotly)
+library(maps)
+library(mapproj)
+
 data_2018 <- read.csv("Data/data_2018.csv", stringsAsFactors = FALSE)
 data_dictonary <- read.csv("Data/data_dictionary.csv", stringsAsFactors = FALSE)
 
@@ -171,6 +174,7 @@ data_2018_race <- data_2018_race %>%
   left_join(voted_percent_total_2018, by="race") %>%
   arrange(desc(total_num))
 
+
 data_2018_race[is.na(data_2018_race)] <- 0
 
 turnout_barplot_2018 <- 
@@ -250,9 +254,142 @@ top_10_state_2018 <- voted_percent_total_state_2018 %>%
   arrange(desc(voted_percent))
 
 
+
 # 3. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
+data_2018_nvote <- data_2018_target %>%
+  select(year, race, voted, vowhynot) %>%
+  filter(voted != "Voted" & vowhynot != "NIU")
+  
+colors <- 
+  c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+
+nvote_reason_2018 <- 
+  plot_ly(data_2018_nvote, labels = ~vowhynot, type = 'pie',
+               textposition = 'inside',
+               textinfo = 'label+percent',
+               insidetextfont = list(color = '#FFFFFF'),
+               insidetextorientation='radial',
+               marker = list(colors = colors,
+                             line = list(color = '#FFFFFF', width = 1)),
+               #The 'pull' attribute can also be used to create space between the sectors
+               showlegend = FALSE)
+
+nvote_reason_2018 <- 
+  nvote_reason_2018 %>% layout(title = 'Commonm Reasons for not voting in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+least_five_race_turnout_2018 <- voted_percent_total_2018 %>%
+  arrange(voted_percent) %>%
+  top_n(-5, voted_percent)
+
+# White-Black-Asian
+wba_2018 <- data_2018_nvote %>%
+  filter(race == "White-Black-Asian")
+
+nvote_reason_wba_2018 <- 
+  plot_ly(wba_2018, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_wba_2018 <- 
+  nvote_reason_wba_2018 %>% layout(title = 'Commonm Reasons for White-Black-Asian not voting in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# White-American Indian-Asian
+waia_2018 <- data_2018_nvote %>%
+  filter(race == "White-American Indian-Asian")
+
+nvote_reason_waia_2018 <- 
+  plot_ly(waia_2018, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          # insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_waia_2018 <- 
+  nvote_reason_waia_2018 %>% layout(title = 'Commonm Reasons for White-American Indian-Asian not voting in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 
+# Asian-Hawaiian/Pacific Islander
+ahpi_2018 <- data_2018_nvote %>%
+  filter(race == "Asian-Hawaiian/Pacific Islander")
+
+nvote_reason_ahpi_2018 <- 
+  plot_ly(ahpi_2018, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          # insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_ahpi_2018 <- 
+  nvote_reason_ahpi_2018 %>% layout(title = 'Commonm Reasons for Asian-Hawaiian/Pacific Islander not voting in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+
+
+# American Indian/Aleut/Eskimo
+aiae_2018 <- data_2018_nvote %>%
+  filter(race == "American Indian/Aleut/Eskimo")
+
+nvote_reason_aiae_2018 <- 
+  plot_ly(aiae_2018, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_aiae_2018 <- 
+  nvote_reason_aiae_2018 %>% layout(title = 'Commonm Reasons for American Indian/Aleut/Eskimo not voting in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               legend = list(size=50))
+
+
+
+
+
+data_2018_nreg <- data_2018_target %>%
+  select(year, race, voreg, voynotreg) %>%
+  filter(voreg != "Registered" & voynotreg != "NIU")
+
+nreg_reason_2018 <- 
+  plot_ly(data_2018_nreg, labels = ~voynotreg, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nreg_reason_2018 <- 
+  nreg_reason_2018 %>% layout(title = 'Commonm Reasons for not registering to vote in 2018',
+                               xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                               yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 # 4. Analyzing the voting methods preferences across (ages, races)
