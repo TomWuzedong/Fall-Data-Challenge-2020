@@ -283,6 +283,67 @@ least_five_race_turnout_2016 <- voted_percent_total_2016 %>%
   arrange(voted_percent) %>%
   top_n(-5, voted_percent)
 
+# White
+white_2016 <- data_2016_nvote %>%
+  filter(race == "White")
+
+nvote_reason_white_2016 <- 
+  plot_ly(white_2016, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_white_2016 <- 
+  nvote_reason_white_2016 %>% layout(title = 'Commonm Reasons for White not voting in 2016',
+                                   xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                                   yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# Asian
+asian_2016 <- data_2016_nvote %>%
+  filter(race == "Asian only")
+
+nvote_reason_asian_2016 <- 
+  plot_ly(asian_2016, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_asian_2016 <- 
+  nvote_reason_asian_2016 %>% layout(title = 'Commonm Reasons for Asian not voting in 2016',
+                                     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                                     yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+# Black/Negro
+black_2016 <- data_2016_nvote %>%
+  filter(race == "Black/Negro")
+
+nvote_reason_black_2016 <- 
+  plot_ly(black_2016, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_black_2016 <- 
+  nvote_reason_black_2016 %>% layout(title = 'Commonm Reasons for Black not voting in 2016',
+                                     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                                     yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+
 # American Indian-Asian
 aia_2016 <- data_2016_nvote %>%
   filter(race == "American Indian-Asian")
@@ -394,3 +455,45 @@ nreg_reason_2016 <-
 
 
 # 4. Analyzing the voting methods preferences across (state, races)
+states_2016 <- data_2016_target %>%
+  group_by(state) %>%
+  summarize(
+    vote_in_person = sum(votehow == "In person"),
+    vote_by_mail = sum(votehow == "By mail")
+  ) %>%
+  mutate(
+    main_voting_method = (vote_in_person > vote_by_mail)
+  ) %>%
+  mutate(state = tolower(state))
+
+states_2016$main_voting_method[states_2016$main_voting_method == "TRUE"] <- "In-Person"
+states_2016$main_voting_method[states_2016$main_voting_method == "FALSE"] <- "By mail"
+
+vote_method_2016 <- map_data("state") %>%
+  rename(state = region) %>%
+  left_join(states_2016, by="state")
+
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(),        # remove axis lines
+    axis.text = element_blank(),        # remove axis labels
+    axis.ticks = element_blank(),       # remove axis ticks
+    axis.title = element_blank(),       # remove axis titles
+    plot.background = element_blank(),  # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank()      # remove border around plot
+  )
+
+vote_method_state_2016 <- 
+  ggplot(vote_method_2016) +
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = main_voting_method),
+    color = "white", 
+    size = .1       
+  ) +
+  coord_map() + # use a map-based coordinate system
+  labs(title = "Vothing method across states (In-person / By mail)",
+       fill = "voting method") +
+  blank_theme
+
