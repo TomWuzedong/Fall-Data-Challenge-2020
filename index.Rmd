@@ -82,23 +82,25 @@ nvote_reason_aiae_2018
 ```
 
 #### Most-populated Races
+##### White
 ```{r echo=FALSE}
+nvote_reason_white_2016
 
+nvote_reason_white_2018
 ```
 
-
+##### Asian
 ```{r echo=FALSE}
+nvote_reason_asian_2016
 
+nvote_reason_asian_2018
 ```
 
-
+##### Black/Negro
 ```{r echo=FALSE}
+nvote_reason_black_2016
 
-```
-
-
-```{r echo=FALSE}
-
+nvote_reason_black_2018
 ```
 
 #### What are the relatively more common reasons for people to not registered to vote?
@@ -106,4 +108,11 @@ nvote_reason_aiae_2018
 nreg_reason_2016
 
 nreg_reason_2018
+```
+
+#### Is there any voting methods preferences across state?
+```{r echo=FALSE}
+vote_method_state_2016
+
+vote_method_state_2018
 ```

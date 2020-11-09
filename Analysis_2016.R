@@ -493,7 +493,7 @@ vote_method_state_2016 <-
     size = .1       
   ) +
   coord_map() + # use a map-based coordinate system
-  labs(title = "Vothing method across states (In-person / By mail)",
+  labs(title = "Vothing method across states (In-person / By mail), 2016",
        fill = "voting method") +
   blank_theme
 
