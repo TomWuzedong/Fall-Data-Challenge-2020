@@ -393,3 +393,49 @@ nreg_reason_2018 <-
                                yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
 # 4. Analyzing the voting methods preferences across (ages, races)
+states_2018 <- data_2018_target %>%
+  group_by(state) %>%
+  summarize(
+    vote_in_person = sum(votehow == "In person"),
+    vote_by_mail = sum(votehow == "By mail")
+  ) %>%
+  mutate(
+    main_voting_method = (vote_in_person > vote_by_mail)
+  ) %>%
+  mutate(state = tolower(state))
+
+states_2018$main_voting_method[states_2018$main_voting_method == "TRUE"] <- "In-Person"
+states_2018$main_voting_method[states_2018$main_voting_method == "FALSE"] <- "By mail"
+
+vote_method_2018 <- map_data("state") %>%
+  rename(state = region) %>%
+  left_join(states_2018, by="state")
+
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(),        # remove axis lines
+    axis.text = element_blank(),        # remove axis labels
+    axis.ticks = element_blank(),       # remove axis ticks
+    axis.title = element_blank(),       # remove axis titles
+    plot.background = element_blank(),  # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank()      # remove border around plot
+  )
+
+vote_method_state_2018 <- 
+  ggplot(vote_method_2018) +
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = main_voting_method),
+    color = "white", 
+    size = .1       
+  ) +
+  coord_map() + # use a map-based coordinate system
+  labs(title = "Vothing method across states (In-person / By mail), 2018",
+       fill = "voting method") +
+  blank_theme
+
+
+
+
+
