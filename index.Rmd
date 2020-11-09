@@ -1,0 +1,109 @@
+---
+title: "ASA Data Challenge Report"
+author: "Ran Liao & Zedong Wu"
+date: "11/8/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+source("Analysis_2016.R")
+source("Analysis_2018.R")
+```
+
+## 2016 VS 2018
+### What is the voting participation percentage for each race and/or by gender across the nation?
+```{r echo=FALSE}
+turnout_barplot_interactive_2016
+
+turnout_barplot_interactive_2018
+```
+
+
+```{r echo=FALSE}
+turnout_sex_interactive_2016
+
+turnout_sex_interactive_2018
+```
+
+### What is the voting participation percentage for each state across the nation?
+```{r echo=FALSE}
+turnout_state_2016_interactive
+
+turnout_state_2018_interactive
+```
+
+
+### What are the relatively more common reasons for people who are in the least-participated races or most populated races to not vote?
+#### Nation Wide
+```{r echo=FALSE}
+nvote_reason_2016
+
+nvote_reason_2018
+```
+
+#### Least-participated Races in 2016
+##### American Indian-Asian
+```{r echo=FALSE}
+nvote_reason_aia_2016
+```
+
+##### American Indian/Aleut/Eskimo
+```{r echo=FALSE}
+nvote_reason_aiae_2016
+```
+
+##### Hawaiian/Pacific Islander only
+```{r echo=FALSE}
+nvote_reason_hpio_2016
+```
+
+##### White-Asian-Hawaiian/Pacific Islander
+```{r echo=FALSE}
+nvote_reason_wahpi_2016
+```
+#### Least-participated Races in 2018
+###### White-Black-Asian
+```{r echo=FALSE}
+nvote_reason_wba_2018
+```
+
+##### White-American Indian-Asian
+```{r echo=FALSE}
+nvote_reason_waia_2018
+```
+
+##### Asian-Hawaiian/Pacific Islander
+```{r echo=FALSE}
+nvote_reason_ahpi_2018
+```
+
+##### American Indian/Aleut/Eskimo
+```{r echo=FALSE}
+nvote_reason_aiae_2018
+```
+
+#### Most-populated Races
+```{r echo=FALSE}
+
+```
+
+
+```{r echo=FALSE}
+
+```
+
+
+```{r echo=FALSE}
+
+```
+
+
+```{r echo=FALSE}
+
+```
+
+#### What are the relatively more common reasons for people to not registered to vote?
+```{r echo=FALSE}
+nreg_reason_2016
+
+nreg_reason_2018
+```

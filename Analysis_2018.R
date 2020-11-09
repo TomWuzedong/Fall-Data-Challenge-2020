@@ -246,17 +246,19 @@ turnout_state_2018 <-
   coord_map() + # use a map-based coordinate system
   scale_fill_continuous(low = "white", high = "Red") +
   labs(title = "Percent of Surveyed Population who Voted by state in 2018",
-       fill = "voted_percent") +
+       fill = "Vote Turnout") +
   blank_theme
 
-top_10_state_2018 <- voted_percent_total_state_2018 %>%
-  top_n(10, voted_percent) %>%
-  arrange(desc(voted_percent))
+turnout_state_2018_interactive <- ggplotly(turnout_state_2018)
 
 
 
 # 3. Analyzing the relatively more common reasons for people
 #   who are in the least-participated races to not vote (Var: VOWHYNOT, VOYNOTREG)
+top_10_state_2018 <- voted_percent_total_state_2018 %>%
+  top_n(10, voted_percent) %>%
+  arrange(desc(voted_percent))
+
 data_2018_nvote <- data_2018_target %>%
   select(year, race, voted, vowhynot) %>%
   filter(voted != "Voted" & vowhynot != "NIU")

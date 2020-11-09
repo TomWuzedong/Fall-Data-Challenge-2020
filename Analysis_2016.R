@@ -183,13 +183,13 @@ turnout_barplot_2016 <-
            position = "fill") +
   # geom_label_repel(data = data_2016_race %>% group_by(race), 
   # mapping = aes(x = fct_rev(fct_infreq(race)), y = total_num, label = voted_percent)) +
-  coord_flip()
-  # labs(
-  #   title = "Percent of Surveyed Population who Voted in each Race in 2016",
-  #   subtitle = "in the descending order of total surveyed population by race",
-  #   y = "Total Surveyed Population", 
-  #   x = "Percentage of Population that voted"
-  # )
+  coord_flip() + 
+  labs(
+     title = "Percent of Surveyed Population who Voted in each Race in 2016",
+     subtitle = "in the descending order of total surveyed population by race",
+     y = "Total Surveyed Population", 
+     x = "Percentage of Population that voted"
+  )
 turnout_barplot_interactive_2016 <- 
   ggplotly(turnout_barplot_2016) %>%
   layout(
@@ -245,6 +245,8 @@ turnout_state_2016 <-
   labs(title = "Percent of Surveyed Population who Voted by state in 2016",
        fill = "voted_percent") +
   blank_theme
+
+turnout_state_2016_interactive <- ggplotly(turnout_state_2016)
 
 top_10_state_2016 <- voted_percent_total_state_2016 %>%
   top_n(10, voted_percent) %>%
