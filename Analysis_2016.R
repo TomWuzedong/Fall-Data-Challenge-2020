@@ -301,6 +301,26 @@ nvote_reason_white_2016 <-
                                    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                                    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
 
+# Asian
+asian_2016 <- data_2016_nvote %>%
+  filter(race == "Asian only")
+
+nvote_reason_asian_2016 <- 
+  plot_ly(asian_2016, labels = ~vowhynot, type = 'pie',
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          insidetextorientation='radial',
+          marker = list(colors = colors,
+                        line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE)
+
+nvote_reason_asian_2016 <- 
+  nvote_reason_asian_2016 %>% layout(title = 'Commonm Reasons for Asian not voting in 2016',
+                                     xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                                     yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
 # Black/Negro
 black_2016 <- data_2016_nvote %>%
   filter(race == "Black/Negro")
@@ -317,10 +337,9 @@ nvote_reason_black_2016 <-
           showlegend = FALSE)
 
 nvote_reason_black_2016 <- 
-  nvote_reason_black_2016 %>% layout(title = 'Commonm Reasons for White not voting in 2016',
+  nvote_reason_black_2016 %>% layout(title = 'Commonm Reasons for Black not voting in 2016',
                                      xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                                      yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
 
 
 # American Indian-Asian
