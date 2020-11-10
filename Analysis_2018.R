@@ -164,9 +164,7 @@ reg_percent_total_state_2018 <- state_class_2018 %>%
 ### Research Questions:
 # 1. Compare the voting participation percentage across different races with the entire race
 #    percentage across the nation. (variable: race, ages, year; mutate percent_"race")
-# mutate percent for each race (length(RACE == "race") / length(data_2018_race))
-# then group by race
-# join the dataset with population in each race in terms of total population
+
 data_2018_race <- data_2018_target %>%
   select(year, age, sex, race, voted)
 
@@ -186,13 +184,13 @@ turnout_barplot_2018 <-
   #               y = voted_num,
   #               label=scales::percent(voted_percent))) +
   # scale_y_continuous(labels = scales::percent) +
-  coord_flip()
-  # labs(
-  #   title = "Percent of Surveyed Population who Voted in each Race in 2018",
-  #   subtitle = "in the descending order of total surveyed population by race",
-  #   y = "Total Surveyed Population", 
-  #   x = "Percentage of Population that voted"
-  # )
+  coord_flip() + 
+  labs(
+    title = "Percent of Surveyed Population who Voted in each Race in 2018",
+    subtitle = "in the descending order of total surveyed population by race",
+    y = "Total Surveyed Population",
+    x = "Percentage of Population that voted"
+  )
 turnout_barplot_interactive_2018 <- 
   ggplotly(turnout_barplot_2018) %>%
   layout(
@@ -203,6 +201,7 @@ turnout_barplot_interactive_2018 <-
 
 turnout_sex_2018 <- turnout_barplot_2018 + facet_wrap(~sex) + theme(axis.title.x=element_blank(),
                                                           axis.title.y = element_blank())
+  
 turnout_sex_interactive_2018 <- 
   ggplotly(turnout_sex_2018) %>%
   layout(
@@ -245,7 +244,7 @@ turnout_state_2018 <-
   ) +
   coord_map() + # use a map-based coordinate system
   scale_fill_continuous(low = "white", high = "Red") +
-  labs(title = "Percent of Surveyed Population who Voted by state in 2018",
+  labs(title = "Percent of Surveyed Population who Voted by State in 2018",
        fill = "Vote Turnout") +
   blank_theme
 

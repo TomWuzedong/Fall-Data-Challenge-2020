@@ -165,9 +165,7 @@ reg_percent_total_state_2016 <- state_class_2016 %>%
 ### Research Questions:
 # 1. Compare the voting participation percentage across different races with the entire race
 #    percentage across the nation. (variable: race, ages, year; mutate percent_"race")
-# mutate percent for each race (length(RACE == "race") / length(data_2016_race))
-# then group by race
-# join the dataset with population in each race in terms of total population
+
 data_2016_race <- data_2016_target %>%
   select(year, age, sex, race, voted)
 
@@ -204,7 +202,7 @@ turnout_sex_2016 <- turnout_barplot_2016 + facet_wrap(~sex) + theme(axis.title.x
 turnout_sex_interactive_2016 <- 
   ggplotly(turnout_sex_2016) %>%
   layout(
-    title = "Percent of Surveyed Population who Voted by gender in 2016",                  
+    title = "Percent of Surveyed Population who Voted by Gender in 2016",                  
     xaxis = list(title = "Percentage of Population that voted"), 
     yaxis = list(title = "Total Surveyed Population")
   )
@@ -242,7 +240,7 @@ turnout_state_2016 <-
   ) +
   coord_map() + # use a map-based coordinate system
   scale_fill_continuous(low = "white", high = "Red") +
-  labs(title = "Percent of Surveyed Population who Voted by state in 2016",
+  labs(title = "Percent of Surveyed Population who Voted by State in 2016",
        fill = "voted_percent") +
   blank_theme
 
